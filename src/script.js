@@ -2,6 +2,8 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+
 
 class PortalHero {
     constructor() {
@@ -31,7 +33,8 @@ class PortalHero {
         })
         this._renderer.shadowMap.enabled = true
         this._renderer.shadowMap.type = THREE.PCFSoftShadowMap
-        this._renderer.setPixelRatio(window.devicePixelRatio)
+        this._renderer.setClearColor('#262837')
+        this._renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         this._renderer.setSize(window.innerWidth, window.innerHeight)
 
         /**
@@ -46,43 +49,71 @@ class PortalHero {
         /**
          * Light
          */
-        let light = new THREE.DirectionalLight(0xffffff, 1.0)
-        light.position.set(20, 100, 10)
-        light.target.position.set(0, 0, 0)
-        light.castShadow = true
-        light.shadow.bias = -0.001
-        light.shadow.mapSize.width = 2048
-        light.shadow.mapSize.height = 2048
-        light.shadow.camera.near = 0.1
-        light.shadow.camera.far = 500.0
-        light.shadow.camera.near = 0.5
-        light.shadow.camera.far = 500.0
-        light.shadow.camera.left = 100
-        light.shadow.camera.right = -100
-        light.shadow.camera.top = 100
-        light.shadow.camera.bottom = -100
-        this._scene.add(light)
+        // let light = new THREE.DirectionalLight(0xffffff, 1.0)
+        // light.position.set(20, 100, 10)
+        // light.target.position.set(0, 0, 0)
+        // light.castShadow = true
+        // light.shadow.bias = -0.001
+        // light.shadow.mapSize.width = 2048
+        // light.shadow.mapSize.height = 2048
+        // light.shadow.camera.near = 0.1
+        // light.shadow.camera.far = 500.0
+        // light.shadow.camera.near = 0.5
+        // light.shadow.camera.far = 500.0
+        // light.shadow.camera.left = 100
+        // light.shadow.camera.right = -100
+        // light.shadow.camera.top = 100
+        // light.shadow.camera.bottom = -100
+        // this._scene.add(light)
 
-        light = new THREE.AmbientLight(0x101010)
-        this._scene.add(light)
+        // light = new THREE.AmbientLight(0x101010)
+        // this._scene.add(light)
+
+        /**
+        * Lights
+        */
+
+        // Ambient light
+        const ambientLight = new THREE.AmbientLight('#b9c5ff', 0.12)
+        // gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
+        this._scene.add(ambientLight)
+
+        // Directional light
+        const moonLight = new THREE.DirectionalLight('#b9c5ff', 0.12)
+        moonLight.position.set(4, 5, -2)
+        // gui.add(moonLight, 'intensity').min(0).max(1).step(0.001)
+        // gui.add(moonLight.position, 'x').min(- 5).max(5).step(0.001)
+        // gui.add(moonLight.position, 'y').min(- 5).max(5).step(0.001)
+        // gui.add(moonLight.position, 'z').min(- 5).max(5).step(0.001)
+        this._scene.add(moonLight)
+
+        const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
+        doorLight.position.set(0, 2.2, 2.7)
+        this._scene.add(doorLight)
+
 
         /**
          * Camera
          */
-        const fov = 60;
+        const fov = 30;
         const aspect = 1920 / 1080
         const near = 1.0
-        const far = 1000.0
+        const far = 3000.0
+
         this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
-        this._camera.position.set(75, 50, 0) // xyz
+        this._camera.position.set(0, 18, 25);
+
+        // Helper
+        const axesHelper = new THREE.AxesHelper(5);
+        this._scene.add(axesHelper)
 
 
         /**
          * Controls
          */
+        // Controls
         const controls = new OrbitControls(this._camera, this._canvas)
-        controls.target.set(0, 20, 0)
-        controls.update()
+        controls.enableDamping = true
 
         /**
          * Background Textures
@@ -97,16 +128,16 @@ class PortalHero {
         //   "/textures/cubeMaps/nz.png",
         // ])
         // this._scene.background = environmentTexture;
-        this._scene.background = new THREE.Color('#0A97DD')
+        // this._scene.background = new THREE.Color('#0A97DD')
 
         /**
          * Objects
          */
         // Floor
         const floor = new THREE.Mesh(
-            new THREE.PlaneGeometry(100, 100, 10, 10),
+            new THREE.PlaneGeometry(30, 30),
             new THREE.MeshStandardMaterial({
-                color: 0xffffff,
+                color: '#000fff',
                 side: THREE.DoubleSide,
             })
         )
@@ -115,13 +146,46 @@ class PortalHero {
         floor.rotation.x = Math.PI / 2
         this._scene.add(floor)
 
+        /**
+         * Models
+         */
+        const gundam = '/models/gundam-tai/scene.gltf'
+        const sasuke = '/models/sasuke-uchiha/scene.gltf'
+
+        const _CHARACTER_MODELS = {
+            warrior: {
+                base: 'mariaJuana.fbx',
+                path: '/models/warrior/',
+                animations: {
+                    // idle: 'idle.fbx',
+                    // walk: 'walk.fbx',
+                    // run: 'run.fbx',
+                    fastRun: 'fastRun.fbx',
+                    // dance: 'dance.fbx',
+                },
+                // nameOffset: 25,
+            },
+            // shaman: {
+            //     base: 'castle_guard_01.fbx',
+            //     path: './resources/characters/guard/',
+            //     animations: {
+            //         idle: 'Sword And Shield Idle.fbx',
+            //         walk: 'Sword And Shield Walk.fbx',
+            //         run: 'Sword And Shield Run.fbx',
+            //         dance: 'Macarena Dance.fbx',
+            //     },
+            //     nameOffset: 20,
+            // }
+        }
+
         // Animation Mixer
         this._mixers = [];
         this._previousRAF = null;
         let time = Date.now()
 
         this._Donkey()
-        this._LoadModel()
+        this._LoadGLTFModel()
+        this._LoadFBXModel()
         this._RAF()
     }
     _Donkey() {
@@ -129,26 +193,33 @@ class PortalHero {
         console.log("Yes indeed")
     }
 
-    _LoadModel() {
+    _LoadGLTFModel() {
+        const sasuke = '/models/sasuke-uchiha/scene.gltf'
+
         // Instantiate a loader
         const loader = new GLTFLoader()
         // Load a glTF resource
         loader.load(
             // resource URL
-            '/resources/models/sasuke-uchiha/scene.gltf',
+            sasuke,
             // called when the resource is loaded
             (gltf) => {
                 let model = gltf.scene
+                model.scale.set(1.5, 1.5, 1.5)
                 this._mixer = new THREE.AnimationMixer(model)
                 const action = this._mixer.clipAction(gltf.animations[0])
                 action.play()
 
+                // position
+                model.position.y = 0.01 // green
+                model.position.x = 10 // red
+                model.position.z = 10 // blue
+
                 this._scene.add(model)
                 this._mixers.push(this._mixer)
 
-                gltf.scene.scale.x = 9
-                gltf.scene.scale.y = 9
-                gltf.scene.scale.z = 9 // THREE.Group
+
+                gltf.scene  // THREE.Group
                 gltf.scenes // Array<THREE.Group>
                 gltf.camera // Array<THREE.Camera>
                 gltf.asset // Object
@@ -161,6 +232,49 @@ class PortalHero {
             // called when loading has errors
             function (error) {
                 console.log('An error happened with GLTF loader')
+
+            })
+    }
+
+    _LoadFBXModel() {
+        const loader = new FBXLoader();
+        // const modelData = this._CHARACTER_MODELS
+        // console.log(this._CHARACTER_MODELS)
+        loader.setPath('/models/warrior/');
+        loader.load('mariaJuana.fbx', (fbx) => {
+            fbx.scale.setScalar(0.012)
+            console.log('fbx loader:');
+            console.log(fbx);
+
+            const model = fbx
+            model.position.y = 0 // green
+            model.position.x = 0 // red
+            model.position.z = -3 // blue
+
+            // const params = {
+            //     target: fbx,
+            //     camera: camera,
+            // }
+            // this._controls = new BasicCharacterControls(params);
+
+            const anim = new FBXLoader();
+            anim.setPath('/models/warrior/');
+            anim.load('fastRun.fbx', (anim) => {
+                const m = new THREE.AnimationMixer(fbx);
+                this._mixers.push(m);
+                const fastRun = m.clipAction(anim.animations[0]);
+                fastRun.play();
+            });
+
+            this._scene.add(model);
+        },
+            // called while loading is progressing
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% fbx loaded')
+            },
+            // called when loading has errors
+            function (error) {
+                console.log('An error happened with FBX loader')
 
             })
     }
