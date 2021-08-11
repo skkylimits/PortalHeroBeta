@@ -183,14 +183,92 @@ class PortalHero {
         this._previousRAF = null;
         let time = Date.now()
 
-        this._Donkey()
-        this._LoadGLTFModel()
+
         this._LoadFBXModel()
+        this._Controller()
         this._RAF()
     }
-    _Donkey() {
-        console.log('im a donkey')
-        console.log("Yes indeed")
+    _Controller() {
+        // Controller
+        document.addEventListener('keydown', (event) => {
+            // console.log('pressingkeys..')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            switch (event.key) {
+                case 'w':
+                    // Do something for "down arrow" key press.
+                    console.log('Pressing W')
+                    this._LoadGLTFModel()
+                    break;
+                case 'a': // a
+                    // this._move.left = true;
+                    console.log('Pressing A')
+                    break;
+                case 's': // s
+                    // this._move.backward = true;
+                    console.log('Pressing S')
+                    break;
+                case 'd': // d
+                    console.log('Pressing D')
+                    // this._move.right = true;
+                    break;
+
+
+                // ! spacebar key not working!
+                case 'Space': // Space
+                    if (event.keycode == 32) {
+                        // this._keys.shift = true;
+                        console.log('TO SPACE AND BEYOND!!');
+                    }
+                    break;
+                case 'Shift': // SHIFT
+                    // this._keys.shift = true;
+                    console.log('SHIFTING TO ANOTHER DIMENSION');
+                    console.log(this._mixers);
+                    break;
+
+
+
+                case "Up": // IE/Edge specific value
+                case "ArrowUp":
+                    // Do something for "up arrow" key press.
+                    console.log('Pressing ⬆️')
+                    break;
+                case "Down": // IE/Edge specific value
+                case "ArrowDown":
+                    // Do something for "down arrow" key press.
+                    console.log('Pressing ⬇️')
+                    break;
+                case "Left": // IE/Edge specific value
+                case "ArrowLeft":
+                    console.log('Pressing ⬅️')
+                    // Do something for "left arrow" key press.
+                    break;
+                case "Right": // IE/Edge specific value
+                case "ArrowRight":
+                    console.log('Pressing ➡️')
+                    // Do something for "right arrow" key press.
+                    break;
+
+
+                case "Enter":
+                    console.log('ENTER ThePromisedLAN..')
+                    console.log(this._scene)
+                    // Do something for "enter" or "return" key press.
+                    break;
+                case "Esc": // IE/Edge specific value
+                case "Escape":
+                    console.log('ESCAPING REALITY..')
+                    this._scene.remove(this._scene.children[this._scene.children.length - 1])
+                    // Do something for "esc" key press.
+                    break;
+            }
+        }, false)
+
+        // window.onkeypress = function (event) {
+        //     if (event.which == 32) {
+        //         console.log('TO SPACE!!')
+        //     }
+        // }
+
     }
 
     _LoadGLTFModel() {
