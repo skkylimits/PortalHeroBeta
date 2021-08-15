@@ -6,8 +6,10 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 
 class CharacterController {
-    constructor() {
+    constructor(params) {
         console.log('%c Character is now controllable..', 'font-size: 18px');
+        this._params = params
+        console.log(console.log(this._params));
         this._input = new CharacterControllerInput()
     }
 }
@@ -15,6 +17,7 @@ class CharacterController {
 class CharacterControllerInput {
     constructor() {
         this._Init();
+        console.log('inside controller input');
     }
 
     _Init() {
@@ -355,12 +358,6 @@ class PortalHero {
             model.position.x = 0 // red
             model.position.z = -6 // blue
 
-            // const params = {
-            //     target: fbx,
-            //     camera: camera,
-            // }
-            // this._controls = new BasicCharacterControls(params);
-
             const anim = new FBXLoader();
             anim.setPath('/models/warrior/');
             anim.load('greatSwordIdle.fbx', (anim) => {
@@ -374,11 +371,15 @@ class PortalHero {
 
             // Addin Character controls
             console.log('%c Character Controller Activated..', 'font-size: 18px')
-            this._controller = new CharacterController()
+            const params = {
+                camera: this._camera,
+                scene: this._scene,
+            }
+            this._controller = new CharacterController(params)
         },
             // called while loading is progressing
             function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '%c % fbx loaded..')
+                console.log((xhr.loaded / xhr.total * 100) + '% fbx loaded..')
             },
             // called when loading has errors
             function (error) {
