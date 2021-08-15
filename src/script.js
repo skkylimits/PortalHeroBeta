@@ -5,12 +5,122 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 
+class CharacterController {
+    constructor() {
+        console.log('%c Character is now controllable..', 'font-size: 18px');
+        this._input = new CharacterControllerInput()
+    }
+}
+
+class CharacterControllerInput {
+    constructor() {
+        this._Init();
+    }
+
+    _Init() {
+        this._keys = {
+            forward: false,
+            backward: false,
+            left: false,
+            right: false,
+            space: false,
+            shift: false,
+        };
+        document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
+        document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
+    }
+
+    _onKeyDown(event) {
+        switch (event.keyCode) {
+            case 87: // w
+                // this._keys.forward = true;
+                console.log('pressing W..');
+                break;
+            case 65: // a
+                // this._keys.left = true;
+                console.log('pressing A..');
+                break;
+            case 83: // s
+                // this._keys.backward = true;
+                console.log('pressing S..');
+                break;
+            case 68: // d
+                // this._keys.right = true;
+                console.log('pressing D..');
+                break;
+
+
+            case 32: // SPACE
+                console.log('OFF TOOOO SPAAACE! 🚀🚀🚀');
+                break;
+            case 16: // SHIFT
+                console.log('SHIFTING TO ANOTHER DIMENSION 👽👽👽');
+                // this._keys.shift = true;
+                break;
+
+
+            case 13:
+                console.log('ENTER ThePromisedLAN..')
+                console.log(this);
+                // console.log(this._scene)
+                break;
+            case 27:
+                console.log('ESCAPING REALITY 😷😷😷')
+                // this._scene.remove(this._scene.children[this._scene.children.length - 1])
+                break;
+        }
+    }
+
+    _onKeyUp(event) {
+        switch (event.keyCode) {
+            case 87: // w
+                // this._keys.forward = true;
+                console.log('%c releasing W..', "color: orange");
+                break;
+            case 65: // a
+                // this._keys.left = true;
+                console.log('%c releasing A..', "color: orange");
+                break;
+            case 83: // s
+                // this._keys.backward = true;
+                console.log('%c releasing S..', "color: orange");
+                break;
+            case 68: // d
+                // this._keys.right = true;
+                console.log('%c releasing D..', "color: orange");
+                break;
+
+
+            case 32: // SPACE
+                console.log('%c BACK FROM SPAAACE! 🚀🚀🚀', "color: orange");
+                break;
+            case 16: // SHIFT
+                console.log('%c UNSHIFTING TO ANOTHER DIMENSION 👽👽👽', "color: orange");
+                // this._keys.shift = true;
+                break;
+
+
+            case 13:
+                console.log('%c losing the ThePromisedLAN..', "color: orange")
+                console.log(this);
+                // console.log(this._scene)
+                break;
+            case 27:
+                console.log('%c UNSTUCKING THE MATRIX 😷😷😷', "color: orange")
+                // this._scene.remove(this._scene.children[this._scene.children.length - 1])
+                break;
+        }
+    }
+}
+
 class PortalHero {
     constructor() {
         this._Initialize()
     }
 
     _Initialize() {
+        console.log('%c Initializing PortalHero..', 'font-size: 18px')
+
         /**
          * Base
          */
@@ -91,7 +201,6 @@ class PortalHero {
         doorLight.position.set(0, 2.2, 2.7)
         this._scene.add(doorLight)
 
-
         /**
          * Camera
          */
@@ -107,11 +216,9 @@ class PortalHero {
         const axesHelper = new THREE.AxesHelper(5);
         this._scene.add(axesHelper)
 
-
         /**
          * Controls
          */
-        // Controls
         const controls = new OrbitControls(this._camera, this._canvas)
         controls.enableDamping = true
 
@@ -149,9 +256,6 @@ class PortalHero {
         /**
          * Models
          */
-        const gundam = '/models/gundam-tai/scene.gltf'
-        const sasuke = '/models/sasuke-uchiha/scene.gltf'
-
         const _CHARACTER_MODELS = {
             warrior: {
                 base: 'mariaJuana.fbx',
@@ -160,7 +264,7 @@ class PortalHero {
                     // idle: 'idle.fbx',
                     // walk: 'walk.fbx',
                     // run: 'run.fbx',
-                    fastRun: 'fastRun.fbx',
+                    fastRun: 'drawAGreatAsword.fbx',
                     // dance: 'dance.fbx',
                 },
                 // nameOffset: 25,
@@ -178,101 +282,23 @@ class PortalHero {
             // }
         }
 
-        // Animation Mixer
-        this._mixers = [];
+        // Animation
         this._previousRAF = null;
         let time = Date.now()
 
+        // Animation Mixer
+        this._mixers = [];
 
+        /**
+         * The Magic Happens HERE
+         */
         this._LoadFBXModel()
-        this._Controller()
         this._RAF()
     }
-    _Controller() {
-        // Controller
-        document.addEventListener('keydown', (event) => {
-            // console.log('pressingkeys..')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-            switch (event.key) {
-                case 'w':
-                    // Do something for "down arrow" key press.
-                    console.log('Pressing W')
-                    this._LoadGLTFModel()
-                    break;
-                case 'a': // a
-                    // this._move.left = true;
-                    console.log('Pressing A')
-                    break;
-                case 's': // s
-                    // this._move.backward = true;
-                    console.log('Pressing S')
-                    break;
-                case 'd': // d
-                    console.log('Pressing D')
-                    // this._move.right = true;
-                    break;
 
-
-                // ! spacebar key not working!
-                case 'Space': // Space
-                    if (event.keycode == 32) {
-                        // this._keys.shift = true;
-                        console.log('TO SPACE AND BEYOND!!');
-                    }
-                    break;
-                case 'Shift': // SHIFT
-                    // this._keys.shift = true;
-                    console.log('SHIFTING TO ANOTHER DIMENSION');
-                    console.log(this._mixers);
-                    break;
-
-
-
-                case "Up": // IE/Edge specific value
-                case "ArrowUp":
-                    // Do something for "up arrow" key press.
-                    console.log('Pressing ⬆️')
-                    break;
-                case "Down": // IE/Edge specific value
-                case "ArrowDown":
-                    // Do something for "down arrow" key press.
-                    console.log('Pressing ⬇️')
-                    break;
-                case "Left": // IE/Edge specific value
-                case "ArrowLeft":
-                    console.log('Pressing ⬅️')
-                    // Do something for "left arrow" key press.
-                    break;
-                case "Right": // IE/Edge specific value
-                case "ArrowRight":
-                    console.log('Pressing ➡️')
-                    // Do something for "right arrow" key press.
-                    break;
-
-
-                case "Enter":
-                    console.log('ENTER ThePromisedLAN..')
-                    console.log(this._scene)
-                    // Do something for "enter" or "return" key press.
-                    break;
-                case "Esc": // IE/Edge specific value
-                case "Escape":
-                    console.log('ESCAPING REALITY..')
-                    this._scene.remove(this._scene.children[this._scene.children.length - 1])
-                    // Do something for "esc" key press.
-                    break;
-            }
-        }, false)
-
-        // window.onkeypress = function (event) {
-        //     if (event.which == 32) {
-        //         console.log('TO SPACE!!')
-        //     }
-        // }
-
-    }
-
-    _LoadGLTFModel() {
+    _LoadGLTFModel(modelFile) {
         const sasuke = '/models/sasuke-uchiha/scene.gltf'
+        const gundam = '/models/gundam-tai/scene.gltf'
 
         // Instantiate a loader
         const loader = new GLTFLoader()
@@ -315,19 +341,19 @@ class PortalHero {
     }
 
     _LoadFBXModel() {
+        console.log('%c loading FBX Models ..', 'color: green; font-size: 18px')
         const loader = new FBXLoader();
         // const modelData = this._CHARACTER_MODELS
         // console.log(this._CHARACTER_MODELS)
         loader.setPath('/models/warrior/');
         loader.load('mariaJuana.fbx', (fbx) => {
             fbx.scale.setScalar(0.012)
-            console.log('fbx loader:');
             console.log(fbx);
 
             const model = fbx
             model.position.y = 0 // green
             model.position.x = 0 // red
-            model.position.z = -3 // blue
+            model.position.z = -6 // blue
 
             // const params = {
             //     target: fbx,
@@ -337,7 +363,7 @@ class PortalHero {
 
             const anim = new FBXLoader();
             anim.setPath('/models/warrior/');
-            anim.load('fastRun.fbx', (anim) => {
+            anim.load('greatSwordIdle.fbx', (anim) => {
                 const m = new THREE.AnimationMixer(fbx);
                 this._mixers.push(m);
                 const fastRun = m.clipAction(anim.animations[0]);
@@ -345,19 +371,24 @@ class PortalHero {
             });
 
             this._scene.add(model);
+
+            // Addin Character controls
+            console.log('%c Character Controller Activated..', 'font-size: 18px')
+            this._controller = new CharacterController()
         },
             // called while loading is progressing
             function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% fbx loaded')
+                console.log((xhr.loaded / xhr.total * 100) + '%c % fbx loaded..')
             },
             // called when loading has errors
             function (error) {
-                console.log('An error happened with FBX loader')
+                console.log('%c An error happened with FBX loader', 'color: red;font-size: 13px')
 
             })
     }
 
     _OnWindowResize() {
+        console.log('%c window resizing..', 'font-size: 18px');
         // Update camera
         this._camera.aspect = window.innerWidth / window.innerHeight
         this._camera.updateProjectionMatrix();
@@ -370,10 +401,12 @@ class PortalHero {
     _RAF() {
         // console.log(deltaTimeV2);
         requestAnimationFrame(() => {
+
             // Time 
             const currentTime = Date.now()
             const deltaTimeV2 = currentTime - this.time
             this.time = currentTime
+
 
             // Animate models
             for (const mixer of this._mixers) {
@@ -392,5 +425,6 @@ class PortalHero {
 let _APP = null
 
 window.addEventListener("DOMContentLoaded", () => {
+    console.log('%c loading DOM content ..', 'font-size:21px')
     _APP = new PortalHero()
 })
