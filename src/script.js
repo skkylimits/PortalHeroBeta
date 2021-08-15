@@ -9,7 +9,6 @@ class CharacterController {
     constructor(params) {
         console.log('%c Character is now controllable..', 'font-size: 18px');
         this._params = params
-        console.log(console.log(this._params));
         this._input = new CharacterControllerInput()
     }
 }
@@ -17,7 +16,6 @@ class CharacterController {
 class CharacterControllerInput {
     constructor() {
         this._Init();
-        console.log('inside controller input');
     }
 
     _Init() {
