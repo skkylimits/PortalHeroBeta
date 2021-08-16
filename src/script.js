@@ -3,13 +3,52 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import * as gui from 'dat.gui'
 
+//! TODO: fix gui.dat
 
 class CharacterController {
     constructor(params) {
         console.log('%c Character is now controllable..', 'font-size: 18px');
+        this._Init(params)
+    }
+
+    _Init(params) {
         this._params = params
-        this._input = new CharacterControllerInput()
+        this._input = new CharacterControllerInput(params)
+
+        this._LoadFBXModel()
+
+    }
+
+    _LoadFBXModel() {
+        console.log('%c loading FBX Model ..', 'color: green; font-size: 18px')
+        const loader = new FBXLoader();
+        loader.setPath('/models/warrior/');
+        loader.load('mariaJuana.fbx', (fbx) => {
+            fbx.scale.setScalar(0.012)
+            fbx.traverse(c => {
+                c.castShadow = false;
+            });
+
+            this._model = fbx
+            console.log(fbx);
+
+            this._model.position.y = 0 // green
+            this._model.position.x = 0 // red
+            this._model.position.z = -3 // blue
+
+            this._params.scene.add(this._model)
+        },
+            // called while loading is progressing
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% fbx loaded..')
+            },
+            // called when loading has errors
+            function (error) {
+                console.log('%c An error happened with FBX loader', 'color: red;font-size: 13px')
+
+            })
     }
 }
 
@@ -158,29 +197,6 @@ class PortalHero {
         )
 
         /**
-         * Light
-         */
-        // let light = new THREE.DirectionalLight(0xffffff, 1.0)
-        // light.position.set(20, 100, 10)
-        // light.target.position.set(0, 0, 0)
-        // light.castShadow = true
-        // light.shadow.bias = -0.001
-        // light.shadow.mapSize.width = 2048
-        // light.shadow.mapSize.height = 2048
-        // light.shadow.camera.near = 0.1
-        // light.shadow.camera.far = 500.0
-        // light.shadow.camera.near = 0.5
-        // light.shadow.camera.far = 500.0
-        // light.shadow.camera.left = 100
-        // light.shadow.camera.right = -100
-        // light.shadow.camera.top = 100
-        // light.shadow.camera.bottom = -100
-        // this._scene.add(light)
-
-        // light = new THREE.AmbientLight(0x101010)
-        // this._scene.add(light)
-
-        /**
         * Lights
         */
 
@@ -198,6 +214,7 @@ class PortalHero {
         // gui.add(moonLight.position, 'z').min(- 5).max(5).step(0.001)
         this._scene.add(moonLight)
 
+        // Point light
         const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
         doorLight.position.set(0, 2.2, 2.7)
         this._scene.add(doorLight)
@@ -218,13 +235,13 @@ class PortalHero {
         this._scene.add(axesHelper)
 
         /**
-         * Controls
+         * Orbit Controls
          */
         const controls = new OrbitControls(this._camera, this._canvas)
         controls.enableDamping = true
 
         /**
-         * Background Textures
+         * Background
          */
         // const cubeTextureLoader = new THREE.CubeTextureLoader()
         // const environmentTexture = cubeTextureLoader.load([
@@ -252,6 +269,7 @@ class PortalHero {
         floor.castShadow = false
         floor.receiveShadow = true
         floor.rotation.x = Math.PI / 2
+
         this._scene.add(floor)
 
         /**
@@ -293,7 +311,8 @@ class PortalHero {
         /**
          * The Magic Happens HERE
          */
-        this._LoadFBXModel()
+        // this._LoadFBXModel()
+        this._LoadAnimatedModelAndController()
         this._RAF()
     }
 
@@ -341,49 +360,15 @@ class PortalHero {
             })
     }
 
-    _LoadFBXModel() {
-        console.log('%c loading FBX Models ..', 'color: green; font-size: 18px')
-        const loader = new FBXLoader();
-        // const modelData = this._CHARACTER_MODELS
-        // console.log(this._CHARACTER_MODELS)
-        loader.setPath('/models/warrior/');
-        loader.load('mariaJuana.fbx', (fbx) => {
-            fbx.scale.setScalar(0.012)
-            console.log(fbx);
-
-            const model = fbx
-            model.position.y = 0 // green
-            model.position.x = 0 // red
-            model.position.z = -6 // blue
-
-            const anim = new FBXLoader();
-            anim.setPath('/models/warrior/');
-            anim.load('greatSwordIdle.fbx', (anim) => {
-                const m = new THREE.AnimationMixer(fbx);
-                this._mixers.push(m);
-                const fastRun = m.clipAction(anim.animations[0]);
-                fastRun.play();
-            });
-
-            this._scene.add(model);
-
-            // Addin Character controls
-            console.log('%c Character Controller Activated..', 'font-size: 18px')
-            const params = {
-                camera: this._camera,
-                scene: this._scene,
-            }
-            this._controller = new CharacterController(params)
-        },
-            // called while loading is progressing
-            function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% fbx loaded..')
-            },
-            // called when loading has errors
-            function (error) {
-                console.log('%c An error happened with FBX loader', 'color: red;font-size: 13px')
-
-            })
+    _LoadAnimatedModelAndController() {
+        // Pushing camera & scene to controllers
+        const params = {
+            camera: this._camera,
+            scene: this._scene,
+        }
+        // Addin Character controller
+        console.log('%c Character Controller Activated..', 'font-size: 18px')
+        this._controller = new CharacterController(params);
     }
 
     _OnWindowResize() {
@@ -398,18 +383,16 @@ class PortalHero {
     }
 
     _RAF() {
-        // console.log(deltaTimeV2);
         requestAnimationFrame(() => {
-
             // Time 
             const currentTime = Date.now()
-            const deltaTimeV2 = currentTime - this.time
+            const deltaTime = currentTime - this.time
             this.time = currentTime
 
 
             // Animate models
             for (const mixer of this._mixers) {
-                mixer.update(deltaTimeV2 * 0.001);
+                mixer.update(deltaTime * 0.001);
             }
 
             // Call RAF on every next frame
